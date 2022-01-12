@@ -1,0 +1,1206 @@
+﻿
+MSBA320-FINAL PROJECT-BUSE¶
+In [1]:
+import pandas as pd
+import numpy as np
+import math
+import seaborn as sns
+from statsmodels import *
+from matplotlib.pyplot import *
+In [2]:
+import csv
+In [3]:
+superstore= pd.read_csv("C:/Users/Buse Bastug/Desktop/superstore.csv", encoding= 'unicode_escape')
+In [4]:
+superstore.head(5)
+Out[4]:
+
+Row ID
+Order ID
+Order Date
+Ship Date
+Ship Mode
+Customer ID
+Customer Name
+Segment
+City
+State
+...
+Product ID
+Category
+Sub-Category
+Product Name
+Sales
+Quantity
+Discount
+Profit
+Shipping Cost
+Order Priority
+0
+42433
+AG-2011-2040
+1/1/2011
+6/1/2011
+Standard Class
+TB-11280
+Toby Braunhardt
+Consumer
+Constantine
+Constantine
+...
+OFF-TEN-10000025
+Office Supplies
+Storage
+Tenex Lockers, Blue
+408.300
+2
+0.0
+106.140
+35.46
+Medium
+1
+22253
+IN-2011-47883
+1/1/2011
+8/1/2011
+Standard Class
+JH-15985
+Joseph Holt
+Consumer
+Wagga Wagga
+New South Wales
+...
+OFF-SU-10000618
+Office Supplies
+Supplies
+Acme Trimmer, High Speed
+120.366
+3
+0.1
+36.036
+9.72
+Medium
+2
+48883
+HU-2011-1220
+1/1/2011
+5/1/2011
+Second Class
+AT-735
+Annie Thurman
+Consumer
+Budapest
+Budapest
+...
+OFF-TEN-10001585
+Office Supplies
+Storage
+Tenex Box, Single Width
+66.120
+4
+0.0
+29.640
+8.17
+High
+3
+11731
+IT-2011-3647632
+1/1/2011
+5/1/2011
+Second Class
+EM-14140
+Eugene Moren
+Home Office
+Stockholm
+Stockholm
+...
+OFF-PA-10001492
+Office Supplies
+Paper
+Enermax Note Cards, Premium
+44.865
+3
+0.5
+-26.055
+4.82
+High
+4
+22255
+IN-2011-47883
+1/1/2011
+8/1/2011
+Standard Class
+JH-15985
+Joseph Holt
+Consumer
+Wagga Wagga
+New South Wales
+...
+FUR-FU-10003447
+Furniture
+Furnishings
+Eldon Light Bulb, Duo Pack
+113.670
+5
+0.1
+37.770
+4.70
+Medium
+5 rows × 24 columns
+In [5]:
+superstore.tail(5)
+Out[5]:
+
+Row ID
+Order ID
+Order Date
+Ship Date
+Ship Mode
+Customer ID
+Customer Name
+Segment
+City
+State
+...
+Product ID
+Category
+Sub-Category
+Product Name
+Sales
+Quantity
+Discount
+Profit
+Shipping Cost
+Order Priority
+51285
+32593
+CA-2014-115427
+31-12-2014
+4/1/2015
+Standard Class
+EB-13975
+Erica Bern
+Corporate
+Fairfield
+California
+...
+OFF-BI-10002103
+Office Supplies
+Binders
+Cardinal Slant-D Ring Binder, Heavy Gauge Vinyl
+13.904
+2
+0.2
+4.5188
+0.89
+Medium
+51286
+47594
+MO-2014-2560
+31-12-2014
+5/1/2015
+Standard Class
+LP-7095
+Liz Preis
+Consumer
+Agadir
+Souss-Massa-Draâ
+...
+OFF-WIL-10001069
+Office Supplies
+Binders
+Wilson Jones Hole Reinforcements, Clear
+3.990
+1
+0.0
+0.4200
+0.49
+Medium
+51287
+8857
+MX-2014-110527
+31-12-2014
+2/1/2015
+Second Class
+CM-12190
+Charlotte Melton
+Consumer
+Managua
+Managua
+...
+OFF-LA-10004182
+Office Supplies
+Labels
+Hon Color Coded Labels, 5000 Label Set
+26.400
+3
+0.0
+12.3600
+0.35
+Medium
+51288
+6852
+MX-2014-114783
+31-12-2014
+6/1/2015
+Standard Class
+TD-20995
+Tamara Dahlen
+Consumer
+Juárez
+Chihuahua
+...
+OFF-LA-10000413
+Office Supplies
+Labels
+Hon Legal Exhibit Labels, Alphabetical
+7.120
+1
+0.0
+0.5600
+0.20
+Medium
+51289
+36388
+CA-2014-156720
+31-12-2014
+4/1/2015
+Standard Class
+JM-15580
+Jill Matthias
+Consumer
+Loveland
+Colorado
+...
+OFF-FA-10003472
+Office Supplies
+Fasteners
+Bagged Rubber Bands
+3.024
+3
+0.2
+-0.6048
+0.17
+Medium
+5 rows × 24 columns
+In [6]:
+superstore.isnull().sum()
+Out[6]:
+Row ID                0
+Order ID              0
+Order Date            0
+Ship Date             0
+Ship Mode             0
+Customer ID           0
+Customer Name         0
+Segment               0
+City                  0
+State                 0
+Country               0
+Postal Code       41296
+Market                0
+Region                0
+Product ID            0
+Category              0
+Sub-Category          0
+Product Name          0
+Sales                 0
+Quantity              0
+Discount              0
+Profit                0
+Shipping Cost         0
+Order Priority        0
+dtype: int64
+In [7]:
+list(superstore)
+Out[7]:
+['Row ID',
+ 'Order ID',
+ 'Order Date',
+ 'Ship Date',
+ 'Ship Mode',
+ 'Customer ID',
+ 'Customer Name',
+ 'Segment',
+ 'City',
+ 'State',
+ 'Country',
+ 'Postal Code',
+ 'Market',
+ 'Region',
+ 'Product ID',
+ 'Category',
+ 'Sub-Category',
+ 'Product Name',
+ 'Sales',
+ 'Quantity',
+ 'Discount',
+ 'Profit',
+ 'Shipping Cost',
+ 'Order Priority']
+In [8]:
+superstore.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 51290 entries, 0 to 51289
+Data columns (total 24 columns):
+ #   Column          Non-Null Count  Dtype  
+---  ------          --------------  -----  
+ 0   Row ID          51290 non-null  int64  
+ 1   Order ID        51290 non-null  object 
+ 2   Order Date      51290 non-null  object 
+ 3   Ship Date       51290 non-null  object 
+ 4   Ship Mode       51290 non-null  object 
+ 5   Customer ID     51290 non-null  object 
+ 6   Customer Name   51290 non-null  object 
+ 7   Segment         51290 non-null  object 
+ 8   City            51290 non-null  object 
+ 9   State           51290 non-null  object 
+ 10  Country         51290 non-null  object 
+ 11  Postal Code     9994 non-null   float64
+ 12  Market          51290 non-null  object 
+ 13  Region          51290 non-null  object 
+ 14  Product ID      51290 non-null  object 
+ 15  Category        51290 non-null  object 
+ 16  Sub-Category    51290 non-null  object 
+ 17  Product Name    51290 non-null  object 
+ 18  Sales           51290 non-null  float64
+ 19  Quantity        51290 non-null  int64  
+ 20  Discount        51290 non-null  float64
+ 21  Profit          51290 non-null  float64
+ 22  Shipping Cost   51290 non-null  float64
+ 23  Order Priority  51290 non-null  object 
+dtypes: float64(5), int64(2), object(17)
+memory usage: 9.4+ MB
+In [9]:
+superstore.shape
+Out[9]:
+(51290, 24)
+In [10]:
+superstore.describe()
+Out[10]:
+
+Row ID
+Postal Code
+Sales
+Quantity
+Discount
+Profit
+Shipping Cost
+count
+51290.00000
+9994.000000
+51290.000000
+51290.000000
+51290.000000
+51290.000000
+51290.000000
+mean
+25645.50000
+55190.379428
+246.490581
+3.476545
+0.142908
+28.610982
+26.375915
+std
+14806.29199
+32063.693350
+487.565361
+2.278766
+0.212280
+174.340972
+57.296804
+min
+1.00000
+1040.000000
+0.444000
+1.000000
+0.000000
+-6599.978000
+0.000000
+25%
+12823.25000
+23223.000000
+30.758625
+2.000000
+0.000000
+0.000000
+2.610000
+50%
+25645.50000
+56430.500000
+85.053000
+3.000000
+0.000000
+9.240000
+7.790000
+75%
+38467.75000
+90008.000000
+251.053200
+5.000000
+0.200000
+36.810000
+24.450000
+max
+51290.00000
+99301.000000
+22638.480000
+14.000000
+0.850000
+8399.976000
+933.570000
+In [11]:
+set(superstore['Segment']) #https://github.com/vibhor98/Time-Series-Forecasting-of-Superstore-dataset/blob/master/Analysis.ipynb
+Out[11]:
+{'Consumer', 'Corporate', 'Home Office'}
+In [12]:
+set(superstore['Category'])
+Out[12]:
+{'Furniture', 'Office Supplies', 'Technology'}
+In [13]:
+set(superstore['Sub-Category'])
+Out[13]:
+{'Accessories',
+ 'Appliances',
+ 'Art',
+ 'Binders',
+ 'Bookcases',
+ 'Chairs',
+ 'Copiers',
+ 'Envelopes',
+ 'Fasteners',
+ 'Furnishings',
+ 'Labels',
+ 'Machines',
+ 'Paper',
+ 'Phones',
+ 'Storage',
+ 'Supplies',
+ 'Tables'}
+In [14]:
+import matplotlib.pyplot as plt
+In [15]:
+#Product Level Analysis
+In [16]:
+ax = sns.boxplot(x="Segment", y="Sales", data=superstore)
+ax.set(xlabel='Customer Segment vs. Sales')
+Out[16]:
+[Text(0.5, 0, 'Customer Segment vs. Sales')]
+ 
+In [167]:
+x = superstore['Segment']
+y = superstore['Sales']
+x_Segment = x.values.reshape(-1,1)
+y_Sales = y.values.reshape(-1,1)
+
+plt.scatter(x, y)
+plt.title('Segment vs. Sales', fontsize= 18)
+plt.xlabel('Segment', fontsize= 18)
+plt.ylabel('Sales', fontsize= 18)
+
+plt.show()
+ 
+In [18]:
+plt.title('Segment vs. Sales')
+plt.xlabel('Segment of Product')
+plt.ylabel('Sale')
+
+superstore['Segment'].value_counts().head(20).plot.bar(figsize= (5,5))
+Out[18]:
+<matplotlib.axes._subplots.AxesSubplot at 0x21ea42c5f08>
+ 
+In [19]:
+#Sub-Category
+plt.title('Category vs. Sales')
+plt.xlabel('Category')
+plt.ylabel('Sale')
+
+superstore['Category'].value_counts().head(20).plot.bar(figsize= (5,5))
+Out[19]:
+<matplotlib.axes._subplots.AxesSubplot at 0x21ea439cbc8>
+ 
+In [20]:
+sns.barplot(x=superstore['Sub-Category'].value_counts().index[:20],y=superstore['Sub-Category'].value_counts().values[:20])
+plt.xticks(rotation=90)
+
+plt.show()
+ 
+In [21]:
+sns.boxplot(x=superstore['Category'][:100],y=superstore['Sales'][:100], palette="Set1")
+
+plt.show()
+ 
+In [22]:
+sns.boxplot(x=superstore['Order Priority'][:100],y=superstore['Sales'][:100], palette="Set1")
+
+plt.show()
+ 
+In [199]:
+sns.boxplot(x=superstore['Ship Mode'][:100],y=superstore['Sales'][:100], palette="Set1")
+
+plt.show()
+ 
+In [23]:
+sns.boxplot(x=superstore['Order Priority'][:100],y=superstore['Profit'][:100], palette="Set3")
+
+plt.show()
+ 
+In [200]:
+sns.boxplot(x=superstore['Ship Mode'][:100],y=superstore['Profit'][:100], palette="Set1")
+
+plt.show()
+ 
+In [26]:
+sns.boxplot(x=superstore['Category'][:100],y=superstore['Profit'][:100], palette="Set2")
+
+plt.show()
+ 
+In [27]:
+superstore.groupby('Sub-Category')['Sales','Profit'].agg(['sum']).plot.bar() 
+#https://www.kaggle.com/juhi1994/superstore-analysis
+C:\Users\Buse Bastug\anaconda3\lib\site-packages\ipykernel_launcher.py:1: FutureWarning: Indexing with multiple keys (implicitly converted to a tuple of keys) will be deprecated, use a list instead.
+  """Entry point for launching an IPython kernel.
+Out[27]:
+<matplotlib.axes._subplots.AxesSubplot at 0x21ea449f648>
+ 
+In [28]:
+superstore.groupby('Category')['Sales','Profit'].agg(['sum']).plot.bar() (figsize= (5,5))
+C:\Users\Buse Bastug\anaconda3\lib\site-packages\ipykernel_launcher.py:1: FutureWarning: Indexing with multiple keys (implicitly converted to a tuple of keys) will be deprecated, use a list instead.
+  """Entry point for launching an IPython kernel.
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+<ipython-input-28-69cc9a03372a> in <module>
+----> 1 superstore.groupby('Category')['Sales','Profit'].agg(['sum']).plot.bar() (figsize= (5,5))
+
+TypeError: 'AxesSubplot' object is not callable
+ 
+In [29]:
+superstore.describe
+Out[29]:
+<bound method NDFrame.describe of        Row ID         Order ID  Order Date Ship Date       Ship Mode  \
+0       42433     AG-2011-2040    1/1/2011  6/1/2011  Standard Class   
+1       22253    IN-2011-47883    1/1/2011  8/1/2011  Standard Class   
+2       48883     HU-2011-1220    1/1/2011  5/1/2011    Second Class   
+3       11731  IT-2011-3647632    1/1/2011  5/1/2011    Second Class   
+4       22255    IN-2011-47883    1/1/2011  8/1/2011  Standard Class   
+...       ...              ...         ...       ...             ...   
+51285   32593   CA-2014-115427  31-12-2014  4/1/2015  Standard Class   
+51286   47594     MO-2014-2560  31-12-2014  5/1/2015  Standard Class   
+51287    8857   MX-2014-110527  31-12-2014  2/1/2015    Second Class   
+51288    6852   MX-2014-114783  31-12-2014  6/1/2015  Standard Class   
+51289   36388   CA-2014-156720  31-12-2014  4/1/2015  Standard Class   
+
+      Customer ID     Customer Name      Segment         City  \
+0        TB-11280   Toby Braunhardt     Consumer  Constantine   
+1        JH-15985       Joseph Holt     Consumer  Wagga Wagga   
+2          AT-735     Annie Thurman     Consumer     Budapest   
+3        EM-14140      Eugene Moren  Home Office    Stockholm   
+4        JH-15985       Joseph Holt     Consumer  Wagga Wagga   
+...           ...               ...          ...          ...   
+51285    EB-13975        Erica Bern    Corporate    Fairfield   
+51286     LP-7095         Liz Preis     Consumer       Agadir   
+51287    CM-12190  Charlotte Melton     Consumer      Managua   
+51288    TD-20995     Tamara Dahlen     Consumer       Juárez   
+51289    JM-15580     Jill Matthias     Consumer     Loveland   
+
+                  State  ...        Product ID         Category Sub-Category  \
+0           Constantine  ...  OFF-TEN-10000025  Office Supplies      Storage   
+1       New South Wales  ...   OFF-SU-10000618  Office Supplies     Supplies   
+2              Budapest  ...  OFF-TEN-10001585  Office Supplies      Storage   
+3             Stockholm  ...   OFF-PA-10001492  Office Supplies        Paper   
+4       New South Wales  ...   FUR-FU-10003447        Furniture  Furnishings   
+...                 ...  ...               ...              ...          ...   
+51285        California  ...   OFF-BI-10002103  Office Supplies      Binders   
+51286  Souss-Massa-Draâ  ...  OFF-WIL-10001069  Office Supplies      Binders   
+51287           Managua  ...   OFF-LA-10004182  Office Supplies       Labels   
+51288         Chihuahua  ...   OFF-LA-10000413  Office Supplies       Labels   
+51289          Colorado  ...   OFF-FA-10003472  Office Supplies    Fasteners   
+
+                                          Product Name    Sales Quantity  \
+0                                  Tenex Lockers, Blue  408.300        2   
+1                             Acme Trimmer, High Speed  120.366        3   
+2                              Tenex Box, Single Width   66.120        4   
+3                          Enermax Note Cards, Premium   44.865        3   
+4                           Eldon Light Bulb, Duo Pack  113.670        5   
+...                                                ...      ...      ...   
+51285  Cardinal Slant-D Ring Binder, Heavy Gauge Vinyl   13.904        2   
+51286          Wilson Jones Hole Reinforcements, Clear    3.990        1   
+51287           Hon Color Coded Labels, 5000 Label Set   26.400        3   
+51288           Hon Legal Exhibit Labels, Alphabetical    7.120        1   
+51289                              Bagged Rubber Bands    3.024        3   
+
+      Discount    Profit  Shipping Cost  Order Priority  
+0          0.0  106.1400          35.46          Medium  
+1          0.1   36.0360           9.72          Medium  
+2          0.0   29.6400           8.17            High  
+3          0.5  -26.0550           4.82            High  
+4          0.1   37.7700           4.70          Medium  
+...        ...       ...            ...             ...  
+51285      0.2    4.5188           0.89          Medium  
+51286      0.0    0.4200           0.49          Medium  
+51287      0.0   12.3600           0.35          Medium  
+51288      0.0    0.5600           0.20          Medium  
+51289      0.2   -0.6048           0.17          Medium  
+
+[51290 rows x 24 columns]>
+In [30]:
+plt.figure(figsize=(13,10))
+ax = sns.countplot(x="Market",
+                     hue="Category", data=superstore)
+plt.title('Market vs. Category', fontsize=20)
+Out[30]:
+Text(0.5, 1.0, 'Market vs. Category')
+ 
+In [198]:
+plt.figure(figsize=(13,10))
+ax = sns.countplot(x="Region",
+                     hue="Category", data=superstore)
+plt.title('Region vs. Category', fontsize=20)
+Out[198]:
+Text(0.5, 1.0, 'Region vs. Category')
+ 
+In [31]:
+plt.figure(figsize=(20,20))
+ax = sns.countplot(x="Market",
+                     hue="Segment", data=superstore)
+plt.title('Market vs. Segment', fontsize=20)
+Out[31]:
+Text(0.5, 1.0, 'Market vs. Segment')
+ 
+In [32]:
+plt.figure(figsize=(20,20))
+ax = sns.countplot(x="Market",
+                     hue="Sub-Category", data=superstore)
+plt.title('Market vs. Sub-Category', fontsize=20)
+Out[32]:
+Text(0.5, 1.0, 'Market vs. Sub-Category')
+ 
+In [33]:
+#Top 10 Countires in Sale
+plt.figure(figsize=(15,7))
+sns.countplot(x='Country',data=superstore, order =superstore['Country'].value_counts()[:10].index)
+plt.title('Top 10 Countries in Sale')
+plt.xlabel('Countries')
+plt.ylabel('Sales')
+Out[33]:
+Text(0, 0.5, 'Sales')
+ 
+In [34]:
+#Top 10 Cities in Sales
+plt.figure(figsize=(13,7))
+sns.countplot(x='City',data=superstore, order =superstore['City'].value_counts()[:10].index)
+plt.title('Top 10 Cities in Sale')
+plt.xlabel('Cities')
+plt.ylabel('Sales')
+Out[34]:
+Text(0, 0.5, 'Sales')
+ 
+In [35]:
+#Top 10 States in Sales
+plt.figure(figsize=(15,13))
+sns.countplot(x='State',data=superstore, order =superstore['State'].value_counts()[:10].index)
+plt.title('Top 10 States in Sale')
+plt.xlabel('States')
+plt.ylabel('Sales')
+Out[35]:
+Text(0, 0.5, 'Sales')
+ 
+In [36]:
+plt.figure(figsize=(20,20))
+sns.countplot(x='Product Name',data=superstore, order =superstore['Product Name'].value_counts()[:10].index)
+Out[36]:
+<matplotlib.axes._subplots.AxesSubplot at 0x21ea454e448>
+ 
+In [205]:
+sns.boxplot(x=superstore['Region'][:100],y=superstore['Profit'][:100], palette="Set2")
+
+plt.show()
+ 
+In [208]:
+sns.boxplot(x=superstore['Region'][:100],y=superstore['Sales'][:100], palette="Set2")
+
+plt.show()
+ 
+In [206]:
+sns.boxplot(x=superstore['Market'][:100],y=superstore['Profit'][:100], palette="Set2")
+
+plt.show()
+ 
+In [207]:
+sns.boxplot(x=superstore['Market'][:100],y=superstore['Sales'][:100], palette="Set2")
+
+plt.show()
+ 
+In [176]:
+superstore.corr()
+Out[176]:
+
+Sales
+Discount
+Profit
+Shipping Cost
+Sales
+1.000000
+-0.086722
+0.484918
+0.768073
+Discount
+-0.086722
+1.000000
+-0.316490
+-0.079056
+Profit
+0.484918
+-0.316490
+1.000000
+0.354441
+Shipping Cost
+0.768073
+-0.079056
+0.354441
+1.000000
+In [177]:
+superstore.describe()
+Out[177]:
+
+Sales
+Discount
+Profit
+Shipping Cost
+count
+51290.000000
+51290.000000
+51290.000000
+51290.000000
+mean
+246.490581
+0.142908
+28.610982
+26.375915
+std
+487.565361
+0.212280
+174.340972
+57.296804
+min
+0.444000
+0.000000
+-6599.978000
+0.000000
+25%
+30.758625
+0.000000
+0.000000
+2.610000
+50%
+85.053000
+0.000000
+9.240000
+7.790000
+75%
+251.053200
+0.200000
+36.810000
+24.450000
+max
+22638.480000
+0.850000
+8399.976000
+933.570000
+Time Series Analysis for years¶
+In [41]:
+#order date and ship date must be datetime, not object
+In [42]:
+superstore['Order Date'] = pd.to_datetime(superstore['Order Date'])
+In [43]:
+superstore['Ship Date']= pd.to_datetime(superstore['Ship Date'])
+In [44]:
+#For Furniture
+In [45]:
+set(superstore['Category'])
+Out[45]:
+{'Furniture', 'Office Supplies', 'Technology'}
+In [46]:
+superstore["Category"].value_counts()
+Out[46]:
+Office Supplies    31273
+Technology         10141
+Furniture           9876
+Name: Category, dtype: int64
+In [47]:
+furniture = superstore.loc[superstore['Category'] == 'Furniture']
+#https://github.com/vibhor98/Time-Series-Forecasting-of-Superstore-dataset/blob/master/Analysis.ipynb
+In [48]:
+furniture['Order Date'].min(), furniture['Order Date'].max()
+#https://haochen23.github.io/2019/02/time-series-analysis-superstore-sales.html#.XyyQGyhKjIU
+Out[48]:
+(Timestamp('2011-01-01 00:00:00'), Timestamp('2014-12-31 00:00:00'))
+In [49]:
+furniture_count = furniture['Order Date'].value_counts()
+furniture_count.head(2)
+Out[49]:
+2014-11-20    29
+2014-08-22    28
+Name: Order Date, dtype: int64
+In [50]:
+furniture = furniture.groupby('Order Date')['Sales'].sum().reset_index()
+#https://github.com/vibhor98/Time-Series-Forecasting-of-Superstore-dataset/blob/master/Analysis.ipynb
+In [51]:
+furniture = furniture.set_index('Order Date') #https://github.com/vibhor98/Time-Series-Forecasting-of-Superstore-dataset/blob/master/Analysis.ipynb
+furniture.index
+Out[51]:
+DatetimeIndex(['2011-01-01', '2011-01-02', '2011-01-03', '2011-01-04',
+               '2011-01-06', '2011-01-07', '2011-01-08', '2011-01-09',
+               '2011-01-11', '2011-01-12',
+               ...
+               '2014-12-22', '2014-12-23', '2014-12-24', '2014-12-25',
+               '2014-12-26', '2014-12-27', '2014-12-28', '2014-12-29',
+               '2014-12-30', '2014-12-31'],
+              dtype='datetime64[ns]', name='Order Date', length=1333, freq=None)
+In [52]:
+furniture = furniture['Sales'].resample('MS').mean() 
+ #https://github.com/vibhor98/Time-Series-Forecasting-of-Superstore-dataset/blob/master/Analysis.ipynb
+In [53]:
+furniture
+Out[53]:
+Order Date
+2011-01-01    1800.746308
+2011-02-01    2173.187157
+2011-03-01    2239.491275
+2011-04-01    1702.323335
+2011-05-01    1397.968678
+2011-06-01    2612.669870
+2011-07-01    1772.268108
+2011-08-01    2855.501432
+2011-09-01    2853.081089
+2011-10-01    2760.690044
+2011-11-01    2277.694436
+2011-12-01    3907.844723
+2012-01-01    1854.689718
+2012-02-01    2102.440914
+2012-03-01    2398.200793
+2012-04-01    2343.232504
+2012-05-01    2601.367570
+2012-06-01    2775.376496
+2012-07-01    1781.268500
+2012-08-01    2935.056861
+2012-09-01    2857.760050
+2012-10-01    2681.884773
+2012-11-01    3254.260741
+2012-12-01    2936.325207
+2013-01-01    2583.949947
+2013-02-01    2097.050388
+2013-03-01    2532.479841
+2013-04-01    2826.031485
+2013-05-01    3431.916672
+2013-06-01    3699.183459
+2013-07-01    2374.502693
+2013-08-01    4002.205748
+2013-09-01    4032.497148
+2013-10-01    3211.735125
+2013-11-01    4390.083010
+2013-12-01    4449.553561
+2014-01-01    2792.452417
+2014-02-01    3436.709868
+2014-03-01    4282.522344
+2014-04-01    3131.717020
+2014-05-01    3238.189097
+2014-06-01    4328.532386
+2014-07-01    3043.407403
+2014-08-01    4391.556296
+2014-09-01    5259.435654
+2014-10-01    4029.520086
+2014-11-01    5479.135247
+2014-12-01    4911.226134
+Freq: MS, Name: Sales, dtype: float64
+In [54]:
+furniture.plot(figsize = (18, 10))
+plt.title('Sales Time Series for Furniture', fontsize=20)
+plt.ylabel('Sales', fontsize=12)
+plt.xlabel('Date', fontsize=12)
+plt.show()
+#https://haochen23.github.io/2019/02/time-series-analysis-superstore-sales.html#.XyyQGyhKjIU
+ 
+In [55]:
+#For Office Supplies
+office_supplies = superstore.loc[superstore['Category'] == 'Office Supplies']
+#https://haochen23.github.io/2019/02/time-series-analysis-superstore-sales.html#.XyyQGyhKjIU
+In [56]:
+office_supplies['Order Date'].min(), office_supplies['Order Date'].max()
+#https://haochen23.github.io/2019/02/time-series-analysis-superstore-sales.html#.XyyQGyhKjIU
+Out[56]:
+(Timestamp('2011-01-01 00:00:00'), Timestamp('2014-12-31 00:00:00'))
+In [57]:
+office_supplies_count = office_supplies['Order Date'].value_counts()
+office_supplies_count.head(2)
+Out[57]:
+2014-06-18    81
+2014-12-29    77
+Name: Order Date, dtype: int64
+In [58]:
+office_supplies = office_supplies.set_index('Order Date') #https://github.com/vibhor98/Time-Series-Forecasting-of-Superstore-dataset/blob/master/Analysis.ipynb
+office_supplies.index
+Out[58]:
+DatetimeIndex(['2011-01-01', '2011-01-01', '2011-01-01', '2011-01-01',
+               '2011-01-01', '2011-01-02', '2011-01-02', '2011-01-02',
+               '2011-01-02', '2011-01-02',
+               ...
+               '2014-12-31', '2014-12-31', '2014-12-31', '2014-12-31',
+               '2014-12-31', '2014-12-31', '2014-12-31', '2014-12-31',
+               '2014-12-31', '2014-12-31'],
+              dtype='datetime64[ns]', name='Order Date', length=31273, freq=None)
+In [59]:
+office_supplies = office_supplies['Sales'].resample('MS').mean() 
+ #https://github.com/vibhor98/Time-Series-Forecasting-of-Superstore-dataset/blob/master/Analysis.ipynb
+In [60]:
+office_supplies
+Out[60]:
+Order Date
+2011-01-01    112.293967
+2011-02-01    119.676637
+2011-03-01    105.566115
+2011-04-01    107.444337
+2011-05-01    161.562630
+2011-06-01    121.492266
+2011-07-01    140.636800
+2011-08-01    124.915805
+2011-09-01    142.426996
+2011-10-01    117.563707
+2011-11-01    119.572171
+2011-12-01    117.332493
+2012-01-01    147.996210
+2012-02-01    107.559664
+2012-03-01    136.245756
+2012-04-01    126.424089
+2012-05-01    112.969368
+2012-06-01    111.001427
+2012-07-01    118.900153
+2012-08-01    122.211971
+2012-09-01     98.052480
+2012-10-01    112.382587
+2012-11-01    114.361598
+2012-12-01    128.398423
+2013-01-01    130.373224
+2013-02-01    153.230576
+2013-03-01    141.196110
+2013-04-01    126.717696
+2013-05-01    113.296147
+2013-06-01    115.934848
+2013-07-01    110.278495
+2013-08-01    108.227185
+2013-09-01    101.880991
+2013-10-01    124.066317
+2013-11-01    114.270261
+2013-12-01    133.004997
+2014-01-01    122.186416
+2014-02-01    100.677607
+2014-03-01    119.932255
+2014-04-01    122.207305
+2014-05-01    132.099229
+2014-06-01    102.340864
+2014-07-01    131.705946
+2014-08-01    152.690437
+2014-09-01    109.921014
+2014-10-01    117.277672
+2014-11-01    126.220737
+2014-12-01    121.214169
+Freq: MS, Name: Sales, dtype: float64
+In [61]:
+office_supplies.plot(figsize = (18, 10))
+plt.title('Sales Time Series for Office Supplies', fontsize=20)
+plt.ylabel('Sales', fontsize=12)
+plt.xlabel('Date', fontsize=12)
+plt.show()
+#https://haochen23.github.io/2019/02/time-series-analysis-superstore-sales.html#.XyyQGyhKjIU
+ 
+In [62]:
+#Technology
+technology = superstore.loc[superstore['Category'] == 'Technology']
+#https://haochen23.github.io/2019/02/time-series-analysis-superstore-sales.html#.XyyQGyhKjIU
+In [63]:
+technology['Order Date'].min(), technology['Order Date'].max()
+#https://haochen23.github.io/2019/02/time-series-analysis-superstore-sales.html#.XyyQGyhKjIU
+Out[63]:
+(Timestamp('2011-01-02 00:00:00'), Timestamp('2014-12-31 00:00:00'))
+In [64]:
+technology_count = technology['Order Date'].value_counts()
+technology_count.head(2)
+Out[64]:
+2014-11-18    32
+2014-04-11    32
+Name: Order Date, dtype: int64
+In [65]:
+technology = technology.set_index('Order Date') #https://github.com/vibhor98/Time-Series-Forecasting-of-Superstore-dataset/blob/master/Analysis.ipynb
+technology.index
+Out[65]:
+DatetimeIndex(['2011-01-02', '2011-01-02', '2011-01-03', '2011-01-03',
+               '2011-01-03', '2011-01-03', '2011-01-03', '2011-01-03',
+               '2011-01-03', '2011-01-03',
+               ...
+               '2014-12-31', '2014-12-31', '2014-12-31', '2014-12-31',
+               '2014-12-31', '2014-12-31', '2014-12-31', '2014-12-31',
+               '2014-12-31', '2014-12-31'],
+              dtype='datetime64[ns]', name='Order Date', length=10141, freq=None)
+In [66]:
+technology = technology['Sales'].resample('MS').mean() 
+ #https://github.com/vibhor98/Time-Series-Forecasting-of-Superstore-dataset/blob/master/Analysis.ipynb
+In [67]:
+technology
+Out[67]:
+Order Date
+2011-01-01    463.075204
+2011-02-01    359.993745
+2011-03-01    617.574981
+2011-04-01    396.995935
+2011-05-01    453.604858
+2011-06-01    372.247993
+2011-07-01    400.534436
+2011-08-01    478.771898
+2011-09-01    580.705830
+2011-10-01    616.691012
+2011-11-01    463.863479
+2011-12-01    405.898644
+2012-01-01    415.210573
+2012-02-01    400.981828
+2012-03-01    372.900257
+2012-04-01    451.158455
+2012-05-01    490.519408
+2012-06-01    449.424069
+2012-07-01    453.058011
+2012-08-01    596.654821
+2012-09-01    505.884021
+2012-10-01    473.116699
+2012-11-01    381.717315
+2012-12-01    523.477429
+2013-01-01    462.414233
+2013-02-01    463.635313
+2013-03-01    524.048337
+2013-04-01    490.171697
+2013-05-01    583.731331
+2013-06-01    478.857124
+2013-07-01    408.477985
+2013-08-01    479.549311
+2013-09-01    414.980411
+2013-10-01    456.469681
+2013-11-01    483.557408
+2013-12-01    479.631840
+2014-01-01    470.703331
+2014-02-01    427.776144
+2014-03-01    497.537012
+2014-04-01    449.884850
+2014-05-01    443.121127
+2014-06-01    488.568879
+2014-07-01    483.193623
+2014-08-01    504.537483
+2014-09-01    426.884071
+2014-10-01    506.570750
+2014-11-01    467.772423
+2014-12-01    440.825596
+Freq: MS, Name: Sales, dtype: float64
+In [68]:
+technology.plot(figsize = (18, 10))
+plt.title('Sales Time Series for Technology', fontsize=20)
+plt.ylabel('Sales', fontsize=12)
+plt.xlabel('Date', fontsize=12)
+plt.show()
+#https://haochen23.github.io/2019/02/time-series-analysis-superstore-sales.html#.XyyQGyhKjIU
+ 
+In [69]:
+furniture.mean()
+Out[69]:
+3058.97757527702
+In [70]:
+office_supplies.mean()
+Out[70]:
+122.04037812473202
+In [71]:
+technology.mean()
+Out[71]:
+467.8533513141158
+In [129]:
+sns.pairplot(superstore, x_vars=['Profit', 'Discount', 'Shipping Cost'], y_vars='Sales', height=4, aspect=1, kind='scatter')
+plt.show()
+#https://www.kaggle.com/ashydv/sales-prediction-simple-linear-regression
+ 
+CORRELATION ANALYSIS¶
+In [39]:
+sns.heatmap(superstore.corr(), annot=True)
+
+plt.show()
+ 
+MULTIPLE LINEAR REGRESSION¶
+In [210]:
+x =superstore [['Shipping Cost', 'Profit']]
+y = superstore['Sales']
+In [170]:
+from sklearn.model_selection import train_test_split
+x_train, x_test, y_train, y_test = train_test_split(x, y, train_size = 0.7, test_size = 0.3, random_state = 100)
+#https://www.kaggle.com/ashydv/sales-prediction-simple-linear-regression
+In [171]:
+import statsmodels.api as sm
+In [172]:
+x_train_sm = sm.add_constant(x_train)
+In [179]:
+lm = LinearRegression()
+In [181]:
+lm.fit(x_train,y_train)
+Out[181]:
+LinearRegression(copy_X=True, fit_intercept=True, n_jobs=None, normalize=False)
+In [182]:
+model = sm.OLS(y_train, x_train_sm).fit()
+In [183]:
+print(model.summary())
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                  Sales   R-squared:                       0.605
+Model:                            OLS   Adj. R-squared:                  0.605
+Method:                 Least Squares   F-statistic:                 2.751e+04
+Date:                Mon, 10 Aug 2020   Prob (F-statistic):               0.00
+Time:                        12:36:17   Log-Likelihood:            -2.5604e+05
+No. Observations:               35903   AIC:                         5.121e+05
+Df Residuals:                   35900   BIC:                         5.121e+05
+Df Model:                           2                                         
+Covariance Type:            nonrobust                                         
+=================================================================================
+                    coef    std err          t      P>|t|      [0.025      0.975]
+---------------------------------------------------------------------------------
+const            75.5242      1.761     42.883      0.000      72.072      78.976
+Shipping Cost     5.9090      0.030    197.334      0.000       5.850       5.968
+Profit            0.5605      0.010     56.552      0.000       0.541       0.580
+==============================================================================
+Omnibus:                    76725.173   Durbin-Watson:                   1.989
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):       1868636837.670
+Skew:                          18.180   Prob(JB):                         0.00
+Kurtosis:                    1120.050   Cond. No.                         192.
+==============================================================================
+
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+In [187]:
+predictions = lm.predict(x_test)
+In [188]:
+from sklearn import metrics
+
+print('MAE:', metrics.mean_absolute_error(y_test, predictions))
+print('MSE:', metrics.mean_squared_error(y_test, predictions))
+print('RMSE:', np.sqrt(metrics.mean_squared_error(y_test, predictions)))
+MAE: 120.26621137550383
+MSE: 71470.9937010563
+RMSE: 267.340594936602
+In [189]:
+sns.distplot((y_test-predictions),bins=50);
+ 
+In [191]:
+coeffecients = pd.DataFrame(lm.coef_,x.columns)
+coeffecients.columns = ['Coeffecient']
+coeffecients
+Out[191]:
+
+Coeffecient
+Shipping Cost
+5.909045
+Profit
+0.560526
+In [ ]:
+ 
